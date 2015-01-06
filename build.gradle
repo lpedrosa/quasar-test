@@ -1,0 +1,23 @@
+apply plugin: 'java'
+apply plugin:'application'
+apply plugin: 'eclipse'
+
+repositories {
+    mavenCentral()
+}
+
+configurations {
+    quasar
+}
+
+dependencies {
+    compile 'co.paralleluniverse:quasar-core:0.6.2'
+    quasar 'co.paralleluniverse:quasar-core:0.6.2'
+}
+
+mainClassName = "atest.TestFibers"
+
+run {
+    jvmArgs "-javaagent:${configurations.quasar.iterator().next()}"
+}
+
