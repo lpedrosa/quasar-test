@@ -1,9 +1,9 @@
 package atest;
 
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
-
 
 import atest.client.RandomClient;
 import atest.client.RandomClientCallback;
@@ -14,7 +14,7 @@ import co.paralleluniverse.fibers.SuspendExecution;import co.paralleluniverse.st
 
 public final class TestFibers {
 
-    public static void main(String[] args) throws InterruptedException {
+    public static void main(String[] args) throws ExecutionException, InterruptedException {
         System.setProperty("co.paralleluniverse.fibers.verifyInstrumentation", "true");
         
         System.out.println("::: SAME THREAD VERSION");
@@ -61,21 +61,24 @@ public final class TestFibers {
         pool.awaitTermination(5000, TimeUnit.MILLISECONDS);
     }
     
-    private static void testRandomClientFiber() {
-        
+    private static void testRandomClientFiber() throws ExecutionException, InterruptedException {
         final RandomClient client = new RandomClient(3000);
         
         System.out.println("Calling RandomClient with provided callback");
         
-        new Fiber<Void>(() -> {
+        final Fiber<Void> fiber = new Fiber<Void>(() -> {
             try { 
                 client.fetchRandom(CALLBACK);
             } catch (InterruptedException ex) { 
                 Strand.currentStrand().interrupt(); 
             }
-        }).start();
+        });
+        
+        fiber.start();
 
         System.out.println("Finished calling client...");
+        
+        fiber.join();
     }
     
     private static RandomClientCallback CALLBACK = new RandomClientCallback() {
