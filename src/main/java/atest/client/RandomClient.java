@@ -22,7 +22,7 @@ public class RandomClient {
         final int result = this.random.nextInt(100);
         
         if (result < 5) {
-            callback.onError(new RandomClientException("Result was less than 5:" + result));
+            callback.onError(new RandomClientException("Result was less than 5: " + result));
         }
         
         callback.onSuccess(result);
